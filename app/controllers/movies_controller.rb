@@ -22,7 +22,7 @@ class MoviesController < ApplicationController
   def index
     @movies = Movie.all
     @movies = Movie.all.sort_by{|m| m.title} if params[:order] == "title"
-    @movies = Movie.all.sort_by{|m| m.release_date} if params[:order] == "release_date"
+    @movies = Movie.all.sort_by{|m| m.release_date}.reverse if params[:order] == "release_date"
     #testing
   end
 
