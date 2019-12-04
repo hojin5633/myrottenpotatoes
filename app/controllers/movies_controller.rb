@@ -20,21 +20,25 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
-    @movies = Movie.all.sort_by{|m| m.title} if params[:order] == "title"
-    @movies = Movie.all.sort_by{|m| m.release_date}.reverse if params[:order] == "release_date"
-    #testing
+    @all_ratings = ['G','PG','PG-13','R']
+    session[:order] = params[:order] unless params[:order].nil?
+    session[:ratings] = params[:ratings] unless params[:ratings].nil?
+#    session[:ratings] = {} if params[:ratings].nil?
+#    @ratings = session[:ratings] unless session[:ratings].nil?
+    ratings = session[:ratings]
+    movies = Movie.all
+    if ratings.any?
+      movies = movies.where(:rating => ratings.keys)
+    end
+    movies = movies.all.sort_by{|m| m.title} if session[:order] == "title"
+    movies = movies.all.sort_by{|m| m.release_date}.reverse if session[:order] == "release_date"
+    
+    @movies = movies
   end
 
   def new
     @movie = Movie.new
   end 
-
-  def create
-    @movie = Movie.create!(movie_params)
-    flash[:notice] = "#{@movie.title} was successfully created."
-    redirect_to movies_path
-  end
 
   def edit
     @movie = Movie.find params[:id]
@@ -62,7 +66,7 @@ class MoviesController < ApplicationController
   end
   
   def hilight(column)
-    if(session[:order].to_s == column)
+    if(session[:order] == column)
       return 'hilite'
     else
       return nil
