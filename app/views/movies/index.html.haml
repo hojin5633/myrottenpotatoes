@@ -1,10 +1,25 @@
+#login
+  - if @current_user
+    %p.welcome  Welcome, #{@current_user.name}!
+    = link_to 'Log Out', logout_path, :method => :post
+  - else
+    %p.login= link_to 'Log in with your Twitter account', '/auth/twitter'
+
 %h2 All Movies
 = form_tag movies_path, :method => :get do
   Include:
   - @all_ratings.each do |rating|
     = rating
-    = check_box_tag "ratings[#{rating}]", nil, session[:ratings].include?(rating)
+    = check_box_tag "ratings[#{rating}]", 1, session[:ratings].include?(rating)
   = submit_tag 'Refresh', :class => 'btn btn-primary'
+  
+= form_tag movies_path, :method => :get do
+  Filter:
+  - ["for_kids", "with_good_reviews", "recently_reviewed"].each do |filter|
+    = filter
+    = check_box_tag "#{filter}"
+  = submit_tag 'Refresh'
+
 %table#movies
   %thead
     %tr
@@ -13,13 +28,7 @@
       %th{:class => ("hilite" if session[:order] == "release_date")}= link_to "Release Date", movies_path({:order => "release_date"}), :id => 'release_date_header'
       %th More Info
   %tbody
-    - @movies.each do |movie|
-      %tr
-        %td= movie.title
-        %td= movie.rating
-        %td= movie.release_date
-        %td= link_to "More about #{movie.title}", movie_path(movie)
-
+    = render :partial => 'movie', :collection=>@movies
 = link_to 'Add new movie', new_movie_path
 
 %h1 Search TMDb for a movie
