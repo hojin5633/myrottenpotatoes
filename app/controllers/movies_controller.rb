@@ -6,7 +6,7 @@ class MoviesController < ApplicationController
   end
 
   def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
+    params.require(:movie).permit(:title, :rating, :description, :release_date, :description)
   end
 =begin
   def create
@@ -20,7 +20,7 @@ class MoviesController < ApplicationController
 =end
   def create
     params.require(:movie)
-    permitted=params[:movie].permit(:title,:rating,:release_date)
+    permitted=params[:movie].permit(:title,:rating,:release_date,:description)
     @movie = Movie.new(permitted)
     if @movie.save
       flash[:notice] = "#{@movie.title} was successfully created."
@@ -29,12 +29,19 @@ class MoviesController < ApplicationController
       render 'new' # note, 'new' template can access @movie's field values!
     end
   end
+=begin
   def show
     id = params[:id] # retrieve movie ID from URI route
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
   end
-
+=end
+  def show
+    id = params[:id] # retrieve movie ID from URI route
+    @movie = Movie.find(id) # look up movie by unique ID
+    render(:partial => 'movie_popup', :object => @movie) if request.xhr?
+    # will render app/views/movies/show.<extension> by default
+  end
   def index
     @all_ratings = ['G','PG','PG-13','R', 'NC-17']
     session[:order] = params[:order] unless params[:order].nil?
@@ -80,7 +87,7 @@ class MoviesController < ApplicationController
 =end
   def update
     @movie = Movie.find params[:id]
-    permitted = params[:movie].permit(:title,:rating,:release_date)
+    permitted = params[:movie].permit(:title,:rating,:release_date,:description)
     if @movie.update_attributes(permitted)
       flash[:notice] = "#{@movie.title} was successfully updated."
       redirect_to movie_path(@movie)

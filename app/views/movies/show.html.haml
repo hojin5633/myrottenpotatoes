@@ -9,9 +9,9 @@
     = @movie.release_date.strftime("%B %d, %Y")
 
 %h3 Description:
+= @movie.description
 
-%p#description= @movie.description
-
+%h3 Potatoes:
 - if @movie.reviews.any?
   %ul
     - @movie.reviews.each do |r|
@@ -20,5 +20,5 @@
   %p Reviews do not Exist!
 
 = link_to 'Edit info', edit_movie_path(@movie)
-= link_to 'Back to movie list', movies_path
+= link_to 'Back to movie list', movies_path(@movie)
 = link_to 'Add Review', new_movie_review_path(@movie)
